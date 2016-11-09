@@ -12,7 +12,7 @@ public class TestFrame{
         northPane(window);
         centerPane(window);
         southPane(window);
-        window.setSize(400,400);
+        window.pack();
         window.setVisible(true);
 
     }
@@ -29,6 +29,7 @@ public class TestFrame{
     private void centerPane(JFrame window){
         JTextArea txtOutPut = new JTextArea();
         txtOutPut.setEditable(false);
+        txtOutPut.setRows(15);
         JScrollPane scroll = new JScrollPane(txtOutPut);
         window.add(scroll,BorderLayout.CENTER);
     }
