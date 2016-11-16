@@ -46,7 +46,7 @@ public class ClassTester {
      */
     public Boolean setupTest(String className) {
         this.className = className;
-        if (isValidClass() && isOfTestClass(this.testClass)){
+        if (isValidClass() && isOfTestClass(this.testClass)) {
             methods = this.testClass.getMethods();
             gotSetUpTearDown();
             return true;
@@ -94,7 +94,8 @@ public class ClassTester {
                 }
             }
             if (!valid) {
-               txtOutput.append("No valid constructor found\n");
+               txtOutput.append("Could not find a constructor that does not " +
+                       "take any arguments\n");
             }
             return valid;
         }

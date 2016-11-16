@@ -13,7 +13,7 @@ import java.awt.event.ActionListener;
  * @version 1.0 14 Nov 2016
  * @author Alexander Nyström
  */
-public class RunButtonListener implements ActionListener {
+public class    RunButtonListener implements ActionListener {
     private JTextField textField;
     private ClassTester tester;
 

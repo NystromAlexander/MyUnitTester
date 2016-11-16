@@ -63,7 +63,7 @@ public class MainWindow {
     }
 
     /**
-     * Creates the south panel with a JButton to meant to clear the content of
+     * Creates the south panel with a JButton meant to clear the content of
      * the JTextArea.
      * @param window the frame where the components will be added.
      */
