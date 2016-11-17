@@ -2,6 +2,7 @@
  * Created by Alexander Nyström(dv15anm) on 09/11/2016.
  *
  */
+
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,19 +14,18 @@ import java.awt.event.ActionListener;
  * @version 1.0 14 Nov 2016
  * @author Alexander Nyström
  */
-public class    RunButtonListener implements ActionListener {
-    private JTextField textField;
+public class RunButtonListener implements ActionListener {
+
     private ClassTester tester;
+    private MainWindow gui;
 
     /**
      * Constructs a new RunButtonListener.
-     * @param inputText The text field which will provide input.
-     * @param outputText The text area which will be used for output from the
-     *                   ClassTester.
+     * @param gui gives the button a access to the content in the gui
      */
-    public RunButtonListener(JTextField inputText, JTextArea outputText) {
-        this.textField = inputText;
-        tester = new ClassTester(outputText);
+    public RunButtonListener(MainWindow gui) {
+        tester = new ClassTester();
+        this.gui = gui;
     }
 
     /**
@@ -35,8 +35,9 @@ public class    RunButtonListener implements ActionListener {
      * @param e The event that triggered the method.
      */
     public void actionPerformed(ActionEvent e) {
-        if (tester.setupTest(textField.getText())) {
+        if (tester.setupTest(gui.getTextFieldCont())) {
             tester.runTests();
         }
+        gui.setTxtOutputCont(tester.getTxtOutput());
     }
 }

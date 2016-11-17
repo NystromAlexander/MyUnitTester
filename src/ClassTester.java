@@ -2,7 +2,7 @@
  * Created by Alexander Nyström(dv15anm) on 09/11/2016.
  *
  */
-import javax.swing.*;
+
 import java.lang.reflect.*;
 
 /**
@@ -23,19 +23,20 @@ public class ClassTester {
     private int exceptionFail;
     private boolean hasSetup;
     private boolean hasTeardown;
+    private boolean ready;
     private String className;
     private Method[] methods;
     private Class<?> testClass;
-    private JTextArea txtOutput;
+    private String txtOutput;
 
     /**
      * Construct a new ClassTester.
-     * @param txtOutput The text area where the result will be shown.
      */
-    public ClassTester(JTextArea txtOutput) {
+    public ClassTester() {
         hasSetup = false;
         hasTeardown = false;
-        this.txtOutput = txtOutput;
+        ready = false;
+        this.txtOutput = "";
     }
 
     /**
@@ -46,9 +47,11 @@ public class ClassTester {
      */
     public Boolean setupTest(String className) {
         this.className = className;
+        ready = false;
         if (isValidClass() && isOfTestClass(this.testClass)) {
             methods = this.testClass.getMethods();
             gotSetUpTearDown();
+            ready = true;
             return true;
         }
         return false;
@@ -83,8 +86,8 @@ public class ClassTester {
             boolean valid = false;
             testClass = Class.forName(className);
             if (testClass.isInterface()) {
-                txtOutput.append("Class is interface and cannot be " +
-                                 "instanced\n");
+                txtOutput = txtOutput.concat("Class is Interface and cannot " +
+                                             "be instanced\n");
                 return false;
             }
             Constructor<?>[] constructors = testClass.getConstructors();
@@ -94,13 +97,17 @@ public class ClassTester {
                 }
             }
             if (!valid) {
-               txtOutput.append("Could not find a constructor that does not " +
-                       "take any arguments\n");
+               txtOutput = txtOutput.concat("Could not find a constructor " +
+                                            "that does not take any " +
+                                            "arguments\n");
             }
             return valid;
-        }
-        catch (ClassNotFoundException e) {
-            txtOutput.append("Could not find class: " + className + "\n");
+        } catch (ClassNotFoundException e) {
+            txtOutput = txtOutput.concat("Could not find class: " + className +
+                                         "\n");
+        } catch (NoClassDefFoundError e) {
+            txtOutput = txtOutput.concat("Could not find class: " + className +
+                                         " (Check spelling)\n\n");
         }
         return false;
     }
@@ -117,7 +124,8 @@ public class ClassTester {
                 return true;
             }
         }
-        txtOutput.append("Class does not implement the interface TestClass.\n");
+        txtOutput = txtOutput.concat("Class does not implement the interface " +
+                                     "TestClass.\n");
         return false;
     }
 
@@ -126,33 +134,37 @@ public class ClassTester {
      * well as the instantiated class.
      */
     public void runTests() {
-        try {
-            Object theClass = testClass.newInstance();
-            for (int i = 0; i < methods.length;i++) {
-                String methodName = methods[i].getName();
+        if (ready) {
+            try {
+                Object theClass = testClass.newInstance();
+                for (int i = 0; i < methods.length; i++) {
+                    String methodName = methods[i].getName();
 
-                if (!methodName.startsWith("test") ||
-                        (methods[i].getReturnType() != boolean.class) ||
-                        (methods[i].getParameterCount() > 0)) {
-                    continue;
+                    if (!methodName.startsWith("test") ||
+                            (methods[i].getReturnType() != boolean.class) ||
+                            (methods[i].getParameterCount() > 0)) {
+                        continue;
+                    }
+                    runMethod(theClass, methodName, i);
                 }
-                runMethod(theClass, methodName, i);
+            } catch (InstantiationException e) {
+                txtOutput = txtOutput.concat("The class could not be " +
+                        "initialized. This could be caused " +
+                        "by the class being abstract" +
+                        " or an array class or a primitive type.\n");
+            } catch (IllegalAccessException e) {
+                txtOutput = txtOutput.concat("Could not access the class or " +
+                                             "it's constructor.\n");
             }
-        } catch (InstantiationException e) {
-            txtOutput.append("The class could not be initialized. This " +
-                             "could be caused by the class being abstract" +
-                             " or an array class or a primitive type.\n");
-        } catch (IllegalAccessException e) {
-            txtOutput.append("Could not access the class or it's " +
-                    "constructor.\n");
-        }
 
-        txtOutput.append("\n" + successCount + " Tests succeeded\n"+ failCount +
-                         " Tests failed\n" + exceptionFail +
-                         " Tests failed" + " by exceptions\n\n");
-        successCount = 0;
-        failCount = 0;
-        exceptionFail = 0;
+            txtOutput = txtOutput.concat("\n" + successCount + " Tests " +
+                                         "succeeded\n" + failCount + " Tests " +
+                                         "failed\n" + exceptionFail + " Tests" +
+                                         " failed" + " by exceptions\n\n");
+            successCount = 0;
+            failCount = 0;
+            exceptionFail = 0;
+        }
     }
 
     /**
@@ -172,10 +184,10 @@ public class ClassTester {
             }
             methodReturn = (Boolean) methods[methodIndex].invoke(theClass);
             if (methodReturn) {
-                txtOutput.append(methodName+": SUCCESS\n");
+                txtOutput = txtOutput.concat(methodName+": SUCCESS\n");
                 successCount++;
             } else {
-                txtOutput.append(methodName+": FAIL\n");
+                txtOutput = txtOutput.concat(methodName+": FAIL\n");
                 failCount++;
             }
 
@@ -183,12 +195,24 @@ public class ClassTester {
                 methods[tearDown].invoke(theClass);
             }
         } catch (InvocationTargetException e) {
-            txtOutput.append(methodName + ": FAIL Generated " +
-                    e.getTargetException() + "\n");
+            txtOutput = txtOutput.concat(methodName + ": FAIL Generated " +
+                                         e.getTargetException() + "\n");
             exceptionFail++;
         } catch (IllegalAccessException e) {
-            txtOutput.append("Could not access the the method " + methodName +
-                             "\n");
+            txtOutput = txtOutput.concat("Could not access the the method " +
+                                         methodName + "\n");
         }
+    }
+
+    /**
+     * Method to get the string containing all the output, and resetting
+     * the string.
+     * @return The string that contains the result from the tests,
+     *         or error messages
+     */
+    public String getTxtOutput() {
+        String temp = txtOutput;
+        txtOutput = "";
+        return temp;
     }
 }

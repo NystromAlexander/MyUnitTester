@@ -6,7 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * MainWindow the main window for MyUnitTester. Has a text field for input in
+ * MainWindow a window which has a text field for input in
  * the north panel with a button to run tests to the right of it.
  * In the center panel it has a text area where the results of the tests will
  * be written. In the south panel it has a button to clear the content of the
@@ -42,10 +42,10 @@ public class MainWindow {
      */
     private void northPane(JFrame window) {
         JPanel panel1 = new JPanel();
-        txtInput.addActionListener(new RunButtonListener(txtInput,txtOutput));
+        txtInput.addActionListener(new RunButtonListener(this));
         panel1.add(txtInput);
         JButton runButton = new JButton("Run tests");
-        runButton.addActionListener(new RunButtonListener(txtInput,txtOutput));
+        runButton.addActionListener(new RunButtonListener(this));
         panel1.add(runButton);
         window.add(panel1, BorderLayout.NORTH);
     }
@@ -69,11 +69,41 @@ public class MainWindow {
      */
     private void southPane(JFrame window) {
         JButton clearButton = new JButton("Clear");
-        clearButton.addActionListener(new ClearButtonListener(txtOutput,
-                                        txtInput));
+        clearButton.addActionListener(new ClearButtonListener(this));
         JPanel panel2 = new JPanel();
         panel2.add(clearButton);
         window.add(panel2,BorderLayout.SOUTH);
+    }
+
+    /**
+     * Method to get the contents of the JTextField.
+     * @return The content from the JTextField.
+     */
+    public String getTextFieldCont() {
+        return txtInput.getText();
+    }
+
+    /**
+     * Method used to append the content in JTextArea.
+     * @param output The string which content will be appended to the JTextArea.
+     */
+    public void setTxtOutputCont(String output) {
+        txtOutput.append(output);
+    }
+
+    /**
+     * Sets the JTextArea to null to clear it.
+     */
+    public void clearTextArea() {
+        txtOutput.setText(null);
+    }
+
+    /**
+     * Selects the content of the JTextField and sets the field to focus.
+     */
+    public void textFieldFocus() {
+        txtInput.selectAll();
+        txtInput.requestFocus();
     }
 
 }

@@ -2,6 +2,7 @@
  * Created by Alexander Nyström(dv15anm) on 2016-11-11.
  *
  */
+
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,19 +15,14 @@ import java.awt.event.ActionListener;
  * @author Alexander Nyström
  */
 public class ClearButtonListener implements ActionListener {
-    private JTextArea txtArea;
-    private JTextField textInput;
+    private MainWindow gui;
 
     /**
      * Constructs a new ClearButtonListener.
-     * @param txtArea The text area that will be cleared when action
-     *                is triggered.
-     * @param textInput The text field to be set in focus when action
-     *                  is triggered.
+     * @param gui gives the button a access to the gui
      */
-    public ClearButtonListener(JTextArea txtArea, JTextField textInput) {
-        this.txtArea = txtArea;
-        this.textInput = textInput;
+    public ClearButtonListener(MainWindow gui) {
+        this.gui = gui;
     }
 
     /**
@@ -35,8 +31,7 @@ public class ClearButtonListener implements ActionListener {
      * @param e The event that triggered the method.
      */
     public void actionPerformed(ActionEvent e) {
-        txtArea.setText(null);
-        textInput.selectAll();
-        textInput.requestFocus();
+        gui.clearTextArea();
+        gui.textFieldFocus();
     }
 }
